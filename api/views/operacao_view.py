@@ -2,7 +2,7 @@ from flask_restful import Resource
 from ..schemas import  operacao_schema
 from flask import request, make_response, jsonify
 from ..entidades import operacao
-from ..services import operacao_service
+from ..services import operacao_service, conta_service
 from api import api
 
 class OperacaoList(Resource):
@@ -22,13 +22,19 @@ class OperacaoList(Resource):
             resumo = request.json["resumo"]
             custo = request.json["custo"]
             tipo = request.json["tipo"]
+            conta = request.json["conta_id"]
 
-            operacao_nova = operacao.Operacao(
-                nome=nome,
-                resumo=resumo,
-                custo=custo,
-                tipo=tipo
-            )
+            if conta_service.listar_conta_id(conta) is None:
+                return make_response("Conta não existe", 404)
+            else:
+                operacao_nova = operacao.Operacao(
+                    nome=nome,
+                    resumo=resumo,
+                    custo=custo,
+                    tipo=tipo,
+                    conta =conta
+                )
+
             resultado = operacao_service.cadastrar_operacao(operacao_nova)
             return make_response(os.jsonify(resultado), 201)
 
@@ -54,11 +60,19 @@ class OperacaoDetail(Resource):
             resumo = request.json["resumo"]
             custo = request.json["custo"]
             tipo = request.json["tipo"]
-            operacao_nova = operacao.Operacao(
-                nome=nome,
-                resumo=resumo,
-                custo=custo,
-                tipo=tipo)
+            conta = request.json["conta_id"]
+
+            if conta_service.listar_conta_id(conta) is None:
+                return make_response("Conta não existe", 404)
+            else:
+                operacao_nova = operacao.Operacao(
+                    nome=nome,
+                    resumo=resumo,
+                    custo=custo,
+                    tipo=tipo,
+                    conta=conta
+                )
+
             resultado = operacao_service.atualizar_operacao(operacao_bd, operacao_nova)
             return make_response(os.jsonify(resultado), 201)
     def delete(self, id):
