@@ -4,9 +4,10 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-app = Flask(__name__)
 
+app = Flask(__name__)
 app.config.from_object('config')
+jwt = JWTManager(app)
 
 db = SQLAlchemy(app)
 
@@ -16,8 +17,5 @@ mi = Migrate(app, db);
 
 api = Api(app)
 
-# Iniciado o JWT Manager
-jwt = JWTManager(app)
-
 from .models import conta_model, operacao_model, usuario_model
-from .views import conta_view, operacao_view, usuario_view, login_view
+from .views import conta_view, operacao_view, usuario_view, login_view, refresh_token_view
